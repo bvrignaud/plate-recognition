@@ -9,6 +9,7 @@ export default defineComponent({
   },
   data() {
     return {
+      loading: false,
       plates: [],
     }
   },
@@ -17,13 +18,15 @@ export default defineComponent({
     return { postSnapshot }
   },
   methods: {
-    async cameraAction(opt) {
+    cameraAction(opt) {
       if (opt === "snap") {
         const blob = this.$refs.camera?.snapshot();
         blob.then(async (data) => {
+          this.loading = true;
           const response = await this.postSnapshot(data)
           console.log(response)
           this.plates = response
+          this.loading = false;
           if (response.length) {
             alert(response[0].plate)
           } else {
@@ -54,7 +57,16 @@ export default defineComponent({
           left: 0;
         "
     >
-      <button type="button" class="button" @click="cameraAction('snap')">
+      <div
+        v-if="loading === true"
+        class="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]"
+        role="status"
+      >
+        <span
+            class="!absolute !-m-px !h-px !w-px !overflow-hidden !whitespace-nowrap !border-0 !p-0 ![clip:rect(0,0,0,0)]"
+        >Loading...</span>
+      </div>
+      <button v-else type="button" class="button" @click="cameraAction('snap')">
         <img
             src="https://img.icons8.com/material-outlined/50/000000/camera--v2.png"
         />
