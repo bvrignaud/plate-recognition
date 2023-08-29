@@ -1,4 +1,4 @@
-<script lang="ts">
+<script>
 import { defineComponent } from "vue";
 import Camera from "simple-vue-camera";
 import { usePlateRecognizer } from "@/composables/usePlateRecognizer";
@@ -17,11 +17,10 @@ export default defineComponent({
     return { postSnapshot }
   },
   methods: {
-    async cameraAction(opt: string) {
+    async cameraAction(opt) {
       if (opt === "snap") {
         const blob = this.$refs.camera?.snapshot();
-        blob.then(async (data: Blob) => {
-          // console.log('data', data)
+        blob.then(async (data) => {
           const response = await this.postSnapshot(data)
           console.log(response)
           this.plates = response
