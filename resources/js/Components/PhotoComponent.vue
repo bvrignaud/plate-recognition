@@ -1,24 +1,41 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import Camera from "simple-vue-camera";
+import { usePlateRecognizer } from "@/composables/usePlateRecognizer";
 
 export default defineComponent({
   components: {
     Camera,
   },
+  data() {
+    return {
+      plates: [],
+    }
+  },
+  setup() {
+    const { postSnapshot } = usePlateRecognizer()
+    return { postSnapshot }
+  },
   methods: {
-    cameraAction(opt) {
+    async cameraAction(opt: string) {
       if (opt === "snap") {
         const blob = this.$refs.camera?.snapshot();
-        blob.then((data) => {
-          console.log(data);
+        blob.then(async (data: Blob) => {
+          // console.log('data', data)
+          const response = await this.postSnapshot(data)
+          console.log(response)
+          this.plates = response
+          if (response.length) {
+            alert(response[0].plate)
+          } else {
+            alert("aucune plaque n'a été trouvée !")
+          }
         });
       }
     },
   }
 });
 </script>
-
 
 <template>
   <div style="position: relative; border: #fffa00 2px solid">
@@ -44,5 +61,9 @@ export default defineComponent({
         />
       </button>
     </div>
+  </div>
+  <div class="text-center">
+    <h2>Résultats :</h2>
+    {{ plates }}
   </div>
 </template>
